@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>Мой портфель</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+/* Layout: markets page of a business weekly — red tab, one big figure, ruled panels, one column. */
+:root{
+  --bg:#fff;--ink:#121212;--mute:#5b6670;--rule:#d5dde2;--panel:#e3ecf0;
+  --red:#e3120b;--on-red:#fff;--slate:#2e6f8e;--up:#1d7a46;--field:#fff;--shadow:rgba(18,18,18,.16);
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10191e;--ink:#e9eef1;--mute:#9aa8b2;--rule:#2a3943;--panel:#182630;
+  --red:#ff5a4f;--on-red:#10191e;--slate:#6fb1cf;--up:#5fcf8d;--field:#0c1418;--shadow:rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10191e;--ink:#e9eef1;--mute:#9aa8b2;--rule:#2a3943;--panel:#182630;
+  --red:#ff5a4f;--on-red:#10191e;--slate:#6fb1cf;--up:#5fcf8d;--field:#0c1418;--shadow:rgba(0,0,0,.5);color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);overflow-x:clip}
+.band{max-width:1240px;margin:0 auto;padding-block:clamp(24px,4vw,48px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.band+.band{padding-top:0}
+.band>*{min-width:0}
+.tab{display:inline-block;background:var(--red);color:var(--on-red);font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;padding:4px 12px;margin-bottom:18px}
+h1,h2{font-family:var(--serif);font-weight:600;line-height:1.08;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,46px)}
+h2{font-size:24px;padding-bottom:10px;margin-bottom:16px;border-bottom:2px solid var(--ink)}
+.big{font-family:var(--serif);font-weight:600;font-size:clamp(38px,8vw,68px);line-height:1;margin:20px 0 8px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kpis{display:flex;flex-wrap:wrap;gap:10px 36px;border-top:1px solid var(--rule);padding-top:14px;margin-top:18px}
+.kpis div{font-size:13px;color:var(--mute)}
+.kpis b{display:block;font-size:20px;color:var(--ink);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.kpis a{color:var(--slate);font-size:13px}
+.pos{color:var(--up)!important}.neg{color:var(--red)!important}
+.note{font-size:14px;color:var(--mute);margin:10px 0 0;max-width:72ch}
+.panel{background:var(--panel);padding:20px}
+
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+label{font-size:13px;color:var(--mute);display:grid;gap:4px}
+input,button{font:16px var(--sans);min-height:44px;border-radius:2px}
+input{border:1px solid var(--rule);background:var(--field);color:var(--ink);padding:8px 10px;width:100%}
+input[readonly]{background:var(--panel);color:var(--mute)}
+input:focus-visible,button:focus-visible{outline:2px solid var(--slate);outline-offset:2px}
+button{border:0;background:var(--ink);color:var(--bg);padding:0 18px;font-weight:600;cursor:pointer}
+button.ghost{background:none;color:var(--mute);border:1px solid var(--rule);min-height:32px;padding:0 10px;font-size:13px;font-weight:500}
+button.ghost:hover{color:var(--ink);border-color:var(--ink)}
+button.ghost.warn{color:var(--red);border-color:var(--red)}
+.err{color:var(--red);font-weight:500;min-height:1.4em}
+
+.combo{position:relative}
+#tkList{position:absolute;z-index:20;top:100%;left:0;width:min(440px,calc(100vw - 32px));max-height:320px;overflow-y:auto;margin:4px 0 0;padding:4px 0;list-style:none;background:var(--field);border:1px solid var(--rule);box-shadow:0 8px 24px var(--shadow)}
+#tkList li{display:grid;grid-template-columns:96px minmax(0,1fr) 40px;gap:10px;padding:9px 12px;cursor:pointer;color:var(--ink);font-size:14px}
+#tkList li span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tkList li span:last-child{color:var(--mute);text-align:right}
+#tkList li[aria-selected="true"],#tkList li:hover{background:var(--panel)}
+#tkList li.none{display:block;color:var(--mute);cursor:default}
+
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:22px}
+.quotes div{background:var(--bg);padding:12px 14px;font-size:12px;color:var(--mute)}
+.quotes b{display:block;font-size:14px;color:var(--ink);letter-spacing:.02em}
+.quotes span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quotes strong{display:block;font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums;margin:4px 0 2px}
+
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+th{font-size:12px;color:var(--mute);font-weight:500;text-align:right;padding:8px;border-bottom:1px solid var(--ink);white-space:nowrap;letter-spacing:.02em}
+th:first-child,td:first-child{text-align:left}
+td{padding:10px 8px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap;vertical-align:top}
+td small{display:block;color:var(--mute);font-size:12px;font-weight:400}
+td.tk{font-weight:600}
+.toggle{background:none;color:var(--slate);border:0;padding:0;min-height:0;font-size:12px;font-weight:500;text-decoration:underline;text-underline-offset:2px}
+tr.lot td{background:var(--panel);font-size:14px;padding:7px 8px}
+tr.lot td:first-child{padding-left:20px}
+.wait{color:var(--mute);font-style:italic}
+
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:96px minmax(0,1fr) 120px 56px;gap:12px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums}
+.bar .track{background:var(--panel);height:14px}
+.bar i{display:block;height:100%;background:var(--slate)}
+.bar span:nth-child(3),.bar span:last-child{text-align:right;white-space:nowrap}
+.bar span:nth-child(3){color:var(--mute)}
+.empty{padding:28px 16px;text-align:center;color:var(--mute);border:1px dashed var(--rule)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center}
+footer{font-size:13px;color:var(--mute)}
+@media(max-width:600px){
+  form{grid-template-columns:1fr}
+  table{font-size:13px}
+  .bar{grid-template-columns:76px minmax(0,1fr) 48px}
+  .bar span:nth-child(3){display:none}
+}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .3s ease}}
+</style>
+
+<header class="band">
+  <span class="tab">Личный портфель · KASE</span>
+  <h1>Сколько стоят мои бумаги сегодня</h1>
+  <div class="big" id="total">—</div>
+  <p id="totalNote" class="note">Добавьте первую покупку ниже</p>
+  <div class="kpis">
+    <div>Вложено<b id="kInv">—</b></div>
+    <div>Прибыль / убыток<b id="kPl">—</b></div>
+    <div>Доходность<b id="kRet">—</b></div>
+    <div>Курс USD/KZT<b id="fxv">—</b><a id="fxd" href="https://nationalbank.kz/ru/exchangerates/ezhednevnye-oficialnye-rynochnye-kursy-valyut" target="_blank" rel="noopener">Нацбанк РК</a></div>
+  </div>
+</header>
+
+<section class="band">
+  <h2>Добавить покупку</h2>
+  <div class="panel">
+    <form id="add" autocomplete="off" novalidate>
+      <label class="combo" for="fT">Тикер KASE
+        <input id="fT" placeholder="Код или название" role="combobox" aria-expanded="false" aria-controls="tkList" aria-autocomplete="list">
+        <ul id="tkList" role="listbox" hidden></ul>
+      </label>
+      <label for="fQ">Количество<input id="fQ" type="number" min="0" step="any" inputmode="decimal"></label>
+      <label for="fD">Дата покупки<input id="fD" type="date"></label>
+      <label for="fP">Цена за 1 бумагу<input id="fP" type="number" min="0" step="any" inputmode="decimal" placeholder="цена KASE"></label>
+      <label for="fC">Валюта на KASE<input id="fC" readonly tabindex="-1" placeholder="по тикеру"></label>
+      <button type="submit" id="fBtn">Добавить</button>
+    </form>
+    <p id="fErr" class="note err" role="alert"></p>
+    <p class="note">Цену можно не вводить: Claude проставит цену закрытия KASE на дату покупки. Если есть цена из брокерского отчёта, впишите её — она будет помечена «своя цена».</p>
+  </div>
+</section>
+
+<section class="band">
+  <h2>Бумаги по компаниям</h2>
+  <div id="quotes" class="quotes" aria-label="Котировки KASE"></div>
+  <div id="holdings"></div>
+  <p class="note">Цена сейчас — последняя сделка на KASE. Цены и курс Нацбанка обновляет Claude: попросите «обнови цены».</p>
+</section>
+
+<section class="band">
+  <h2>Доли в портфеле</h2>
+  <div id="bars" class="bars"></div>
+</section>
+
+<footer class="band">
+  <span id="status">Подключаю хранилище…</span>
+</footer>
+
+<script>
+(() => {
+const KASE=[["AAFD","АзияАгроФуд","KZT"],["ADLA","Айдала Мунай","KZT"],["AIRA","Эйр Астана","KZT"],["AIRAd","Эйр Астана","USD"],["AKGR","Акжал Голд Ресорсиз","KZT"],["AKRL","Ай Карааул","KZT"],["AKZM","Актюбинский завод металлоконструкций","KZT"],["ALMS","АК Алтыналмас","KZT"],["ALMT","AltaMet Minerals","KZT"],["ALTV","АлмаТел Казахстан","KZT"],["AMAN","Алтай Ресорсиз","KZT"],["AMGZp","Актобемунайгаз","KZT"],["AMXP","Аскер Мунай Эксплорэйшн","KZT"],["ASBN","ForteBank","KZT"],["ASKQ","ALTYN SAMRUK QAZAQSTAN","KZT"],["ASKQp","ALTYN SAMRUK QAZAQSTAN","KZT"],["ASLF","КСЖ Freedom Life","KZT"],["ASTL","ASTEL","KZT"],["ATEC","AltynEx","KZT"],["AZNO","Актюбинский завод нефтяного оборудования","KZT"],["AZNOp","Актюбинский завод нефтяного оборудования","KZT"],["BAST","БАСТ","KZT"],["BSUL","Баян Сулу","KZT"],["CCBN","Банк ЦентрКредит","KZT"],["CCBNp","Банк ЦентрКредит","KZT"],["CORE_KZ","Solidcore Resources plc","USD"],["CRMG","Кристалл Менеджмент","KZT"],["CSEC","Сентрас Секьюритиз","KZT"],["EKTN","ЭКОТОН+","KZT"],["EXCS","Товарная Биржа \"Каспий\"","KZT"],["EXCSp","Товарная Биржа \"Каспий\"","KZT"],["EXPA","Green Power Generation","KZT"],["FFIN","Фридом Финанс","KZT"],["FHRP","Финансовый холдинг \"Республика\"","KZT"],["FRHC_KZ","Freedom Holding Corp.","USD"],["GB_ALTN","AltynGold plc","KZT"],["HSBK","Народный Банк Казахстана","KZT"],["HSBKd","Народный Банк Казахстана (GDR)","USD"],["IFDR","Teniz Capital Investment Banking","KZT"],["INBNp","Bank RBK","KZT"],["KASE","KASE","KZT"],["KATR","Атамекен-Агро","KZT"],["KATRp","Атамекен-Агро","KZT"],["KCEL","Kcell","KZT"],["KEGC","KEGOC","KZT"],["KMGD","KM GOLD","KZT"],["KMGZ","КазМунайГаз","KZT"],["KOZN","КоЖаН","KZT"],["KSNF","Каспий нефть","KZT"],["KSPI","Kaspi.kz","KZT"],["KSPId","Kaspi.kz (ADS)","USD"],["KZAP","Казатомпром","KZT"],["KZAPd","Казатомпром (GDR)","USD"],["KZAZ","КазАзот","KZT"],["KZHR","Каражыра","KZT"],["KZIK","Казахстанская Жилищная Компания","KZT"],["KZTK","Казахтелеком","KZT"],["KZTKp","Казахтелеком","KZT"],["KZTO","КазТрансОйл","KZT"],["LNPT","KMK Мунай","KZT"],["LOGC","ЛОГИКОМ","KZT"],["LZGR","Лизинг Групп","KZT"],["MATN","Матен Петролеум","KZT"],["MKBW","Майкубен-Вест","KZT"],["MMGZ","Мангистаумунайгаз","KZT"],["MMGZp","Мангистаумунайгаз","KZT"],["MREK","МРЭК","KZT"],["NRBN","Нурбанк","KZT"],["NRBNp6","Нурбанк","KZT"],["PHYS","Phystech II","KZT"],["RAHT","ЛОТТЕ Рахат","KZT"],["RGBR","RG Brands","KZT"],["RGBRp","RG Brands","KZT"],["SABR","СК Sinoasia B&R","KZT"],["SABRp","СК Sinoasia B&R","KZT"],["SAS_","С.А.С.","KZT"],["SATC","Fincraft Resources","KZT"],["SATCp","Fincraft Resources","KZT"],["SHUP","Шубарколь Премиум","KZT"],["SHZN","ШалкияЦинк","KZT"],["SKSL","КСЖ Standard Life","KZT"],["TMLZ","ForteLeasing","KZT"],["TPIB","Tencor Securities","KZT"],["TRRX","Terrox Metals","KZT"],["TSBN","Alatau City Bank","KZT"],["TSBNp","Alatau City Bank","KZT"],["ULBS","Ulmus Besshoky","KZT"],["UTMK","УК титано-магниевый комбинат","KZT"],["UTMKp","УК титано-магниевый комбинат","KZT"],["AAL_KZ","American Airlines","USD"],["AAPL_KZ","Apple Inc.","USD"],["ABT_KZ","Abbott","USD"],["AEP_KZ","American Electric Power","USD"],["AIR_KZ","Airbus","KZT"],["AMD_KZ","Advanced Micro Devices","USD"],["AMZN_KZ","Amazon.com","USD"],["ANT_KZ","Anthropic PBC","USD"],["AVGO_KZ","Broadcom","USD"],["BABAd","Alibaba Group","USD"],["BAC_KZ","Bank of America","USD"],["BA_KZ","Boeing","USD"],["BIDUd","Baidu","USD"],["BIIB_KZ","Biogen","USD"],["BIL_KZ","SPDR Bloomberg 1-3 Month T-Bill ETF","USD"],["BITI_KZ","ProShares Short Bitcoin ETF","USD"],["BITO_KZ","ProShares Bitcoin ETF","USD"],["BOTZ_KZ","Global X Robotics & AI ETF","USD"],["CAT_KZ","Caterpillar","USD"],["C_KZ","Citigroup","USD"],["COP_KZ","ConocoPhillips","USD"],["CRC_KZ","California Resources","USD"],["CRM_KZ","Salesforce","USD"],["CVX_KZ","Chevron","USD"],["DIS_KZ","Walt Disney","USD"],["ETHA_KZ","iShares Ethereum Trust ETF","USD"],["ETHT_KZ","ProShares Ether ETF","USD"],["EWQ_KZ","iShares MSCI France ETF","USD"],["FCX_KZ","Freeport-McMoRan","USD"],["F_KZ","Ford Motor","USD"],["FLGB_KZ","Franklin FTSE UK ETF","USD"],["FTNT_KZ","Fortinet","USD"],["FXI_KZ","iShares China Large-Cap ETF","USD"],["GALP_KZ","Galp Energia","KZT"],["GDX_KZ","VanEck Gold Miners ETF","USD"],["GLD_KZ","SPDR Gold Trust","USD"],["GOOG_KZ","Alphabet","USD"],["HEPSd","Hepsiburada","USD"],["HYG_KZ","iShares High Yield Corporate Bond ETF","USD"],["IBIT_KZ","iShares Bitcoin Trust ETF","USD"],["IBM_KZ","IBM","USD"],["ICLN_KZ","iShares Global Clean Energy ETF","USD"],["IGLB_KZ","iShares 10+ Year Corporate Bond ETF","USD"],["INTC_KZ","Intel","USD"],["JNJ_KZ","Johnson & Johnson","USD"],["JPM_KZ","JPMorgan Chase","USD"],["KO_KZ","Coca-Cola","USD"],["LQD_KZ","iShares Investment Grade Corporate Bond ETF","USD"],["MA_KZ","Mastercard","USD"],["META_KZ","Meta Platforms","USD"],["M_KZ","Macy's","USD"],["MRNA_KZ","Moderna","USD"],["MRVL_KZ","Marvell Technology","USD"],["MSFT_KZ","Microsoft","USD"],["MTB_KZ","M&T Bank","USD"],["MU_KZ","Micron Technology","USD"],["NBIS_KZ","Nebius Group","USD"],["NEM_KZ","Newmont","USD"],["NFLX_KZ","Netflix","USD"],["NKE_KZ","Nike","USD"],["NVDA_KZ","NVIDIA","USD"],["ORCL_KZ","Oracle","USD"],["OXY_KZ","Occidental Petroleum","USD"],["PFE_KZ","Pfizer","USD"],["PHO_KZ","Invesco Water Resources ETF","USD"],["PYPL_KZ","PayPal","USD"],["QCOM_KZ","Qualcomm","USD"],["QQQ_KZ","Invesco QQQ Trust","USD"],["SBUX_KZ","Starbucks","USD"],["SKHYd","SK hynix","USD"],["SLV_KZ","iShares Silver Trust","USD"],["SNDK_KZ","Sandisk","USD"],["SOLZ_KZ","Volatility Shares Solana ETF","USD"],["SPCX_KZ","Space Exploration Technologies","USD"],["SPY_KZ","SPDR S&P 500 ETF","USD"],["T_KZ","AT&T","USD"],["TLT_KZ","iShares 20+ Year Treasury Bond ETF","USD"],["TSLA_KZ","Tesla","USD"],["TXN_KZ","Texas Instruments","USD"],["UBER_KZ","Uber Technologies","USD"],["URA_KZ","Global X Uranium ETF","USD"],["VZ_KZ","Verizon","USD"],["XLP_KZ","Consumer Staples Select Sector SPDR","USD"],["XLU_KZ","Utilities Select Sector SPDR","USD"],["XOM_KZ","ExxonMobil","USD"]];
+const STARTERS=["AAPL_KZ","FRHC_KZ","HSBK","KZAP"];
+const NAMES={},CUR={};
+for(const[t,n,c]of KASE){NAMES[t]=n;CUR[t]=c}
+
+let S={lots:[]};
+let M={fx:null,px:{}};
+const open={};let armed=null;
+let docRef=null,saveTimer=null,saving=Promise.resolve();
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nf=(v,d=2)=>new Intl.NumberFormat("ru-RU",{minimumFractionDigits:d,maximumFractionDigits:d}).format(v);
+const money=(v,c)=>c==="KZT"?nf(v,v!==0&&Math.abs(v)<100?2:0)+" ₸":nf(v,2)+" $";
+const signed=(v,c)=>(v>0?"+":"")+money(v,c);
+const pct=v=>(v>0?"+":"")+nf(v*100,1)+"%";
+const cls=v=>v>0?"pos":v<0?"neg":"";
+const fmtD=d=>{const[y,m,dd]=String(d||"").split("-");return dd&&m&&y?dd+"."+m+"."+y:"—"};
+const num=v=>typeof v==="number"&&isFinite(v)?v:null;
+const qty=q=>new Intl.NumberFormat("ru-RU",{maximumFractionDigits:4}).format(q);
+const fxRate=()=>M.fx&&num(M.fx.r);
+const toKzt=(v,c)=>c==="KZT"?v:(fxRate()!=null?v*fxRate():null);
+const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+
+function quoteFor(t,c){const m=M.px[t];return m&&m.c===c&&num(m.p)!=null?m:null}
+
+function groups(){
+  const g={};
+  for(const l of S.lots){
+    const k=l.t+"|"+l.c;
+    const x=g[k]||(g[k]={k,t:l.t,c:l.c,q:0,inv:0,qp:0,dw:0,wait:0,lots:[]});
+    x.q+=l.q;x.lots.push(l);
+    if(num(l.p)!=null){x.qp+=l.q;x.inv+=l.q*l.p;x.dw+=l.q*l.p*Date.parse(l.d)}else x.wait++;
+  }
+  return Object.values(g).map(x=>{
+    const m=quoteFor(x.t,x.c),p=m?m.p:null;
+    const val=p!=null?x.q*p:null;
+    const valP=p!=null?x.qp*p:null;
+    const pl=valP!=null&&x.inv>0?valP-x.inv:null;
+    const r=pl!=null?pl/x.inv:null;
+    const days=x.inv>0?(Date.now()-x.dw/x.inv)/864e5:0;
+    const ann=r!=null&&days>=90?Math.pow(1+r,365/days)-1:null;
+    x.lots.sort((a,b)=>String(a.d).localeCompare(String(b.d)));
+    return {...x,m,p,val,valP,pl,r,ann,avg:x.qp?x.inv/x.qp:null};
+  }).sort((a,b)=>a.t.localeCompare(b.t));
+}
+
+function renderHead(G){
+  const r=fxRate();
+  $("fxv").textContent=r!=null?nf(r)+" ₸":"—";
+  $("fxd").textContent=r!=null?(M.fx.src||"Нацбанк РК")+" на "+fmtD(M.fx.d):"Нацбанк РК";
+  const kp=$("kPl"),kr=$("kRet");
+  if(!G.length){
+    $("total").textContent="—";$("totalNote").textContent="Добавьте первую покупку ниже";
+    $("kInv").textContent=kp.textContent=kr.textContent="—";kp.className=kr.className="";return;
+  }
+  let inv=0,valP=0,val=0,noPx=0,wait=0,noFx=0;
+  for(const g of G){
+    wait+=g.wait;
+    if(g.p==null){noPx++;continue}
+    const a=toKzt(g.inv,g.c),b=toKzt(g.valP,g.c),c=toKzt(g.val,g.c);
+    if(c==null){noFx++;continue}
+    inv+=a;valP+=b;val+=c;
+  }
+  const pl=valP-inv;
+  $("total").textContent=money(val,"KZT");
+  const notes=[];
+  if(noPx)notes.push(noPx+" "+plural(noPx,"бумага","бумаги","бумаг")+" без цены KASE");
+  if(wait)notes.push(wait+" "+plural(wait,"покупка ждёт","покупки ждут","покупок ждут")+" цену на дату покупки");
+  if(noFx)notes.push("нет курса USD/KZT");
+  $("totalNote").textContent=notes.length?"Стоимость в тенге. Не учтено: "+notes.join("; ")+".":"Стоимость всех бумаг в тенге по ценам KASE и курсу Нацбанка.";
+  $("kInv").textContent=money(inv,"KZT");
+  kp.textContent=signed(pl,"KZT");kp.className=cls(pl);
+  kr.textContent=inv>0?pct(pl/inv):"—";kr.className=inv>0?cls(pl):"";
+}
+function plural(n,a,b,c){const m=n%10,h=n%100;return m===1&&h!==11?a:m>=2&&m<=4&&(h<12||h>14)?b:c}
+
+function renderQuotes(){
+  const Q=Object.entries(M.px).sort((a,b)=>a[0].localeCompare(b[0]));
+  $("quotes").innerHTML=Q.map(([t,m])=>`<div><b>${esc(t)}</b><span>${esc(NAMES[t]||"")}</span><strong>${num(m.p)!=null?esc(money(m.p,m.c)):"—"}</strong><span>${esc(m.src||"KASE")}, ${esc(fmtD(m.d))}</span></div>`).join("");
+  $("quotes").hidden=!Q.length;
+}
+
+function renderTable(G){
+  if(!G.length){
+    $("holdings").innerHTML=`<div class="empty">Пока нет покупок. Начните с одной из своих бумаг:<div class="chips">${STARTERS.map(t=>`<button type="button" class="ghost" data-pick="${t}">${t}</button>`).join("")}</div></div>`;
+    return;
+  }
+  let h=`<div class="scroll"><table><thead><tr><th>Компания</th><th>Кол-во</th><th>Средняя цена</th><th>Потрачено</th><th>Цена сейчас</th><th>Стоимость</th><th>Прибыль</th><th>Доходность</th></tr></thead><tbody>`;
+  for(const g of G){
+    const k=esc(g.k),n=g.lots.length;
+    h+=`<tr><td class="tk">${esc(g.t)}<small>${esc(NAMES[g.t]||"")} · ${n} ${plural(n,"покупка","покупки","покупок")} · <button type="button" class="toggle" data-open="${k}" aria-expanded="${!!open[g.k]}">${open[g.k]?"скрыть":"показать"}</button></small></td>
+<td>${qty(g.q)}</td>
+<td>${g.avg!=null?esc(money(g.avg,g.c)):"—"}</td>
+<td>${g.inv?esc(money(g.inv,g.c)):"—"}${g.wait?`<small>${g.wait} ждут цену</small>`:""}</td>
+<td>${g.p!=null?esc(money(g.p,g.c))+`<small>${esc(g.m.src||"KASE")}, ${esc(fmtD(g.m.d))}</small>`:`<span class="wait">нет цены</span>`}</td>
+<td>${g.val!=null?esc(money(g.val,g.c)):"—"}</td>
+<td class="${cls(g.pl)}">${g.pl!=null?esc(signed(g.pl,g.c)):"—"}</td>
+<td class="${cls(g.pl)}">${g.r!=null?pct(g.r):"—"}${g.ann!=null?`<small>${pct(g.ann)} годовых</small>`:""}</td></tr>`;
+    if(open[g.k])for(const l of g.lots){
+      const lp=num(l.p),lv=g.p!=null?l.q*g.p:null,lr=lp&&g.p!=null?(g.p-lp)/lp:null,lpl=lp&&lv!=null?lv-l.q*lp:null;
+      const del=armed===l.id;
+      h+=`<tr class="lot"><td>${esc(fmtD(l.d))}</td><td>${qty(l.q)}</td>
+<td>${lp!=null?esc(money(lp,l.c))+`<small>${esc(l.src||"")}</small>`:`<span class="wait">ждёт цену</span>`}</td>
+<td>${lp!=null?esc(money(l.q*lp,l.c)):"—"}</td><td></td>
+<td>${lv!=null?esc(money(lv,l.c)):"—"}</td>
+<td class="${cls(lpl)}">${lpl!=null?esc(signed(lpl,l.c)):"—"}</td>
+<td><span class="${cls(lr)}">${lr!=null?pct(lr):"—"}</span> <button type="button" class="ghost${del?" warn":""}" data-del="${esc(l.id)}">${del?"Точно удалить?":"Удалить"}</button></td></tr>`;
+    }
+  }
+  $("holdings").innerHTML=h+"</tbody></table></div>";
+}
+
+function renderBars(G){
+  const vals=G.map(g=>{const v=g.val!=null?toKzt(g.val,g.c):(g.inv?toKzt(g.inv,g.c):null);return{t:g.t,v:v||0}}).filter(x=>x.v>0);
+  const sum=vals.reduce((a,b)=>a+b.v,0);
+  $("bars").innerHTML=sum>0?vals.sort((a,b)=>b.v-a.v).map(x=>{const s=x.v/sum;return`<div class="bar"><span>${esc(x.t)}</span><div class="track"><i style="width:${(s*100).toFixed(1)}%"></i></div><span>${esc(money(x.v,"KZT"))}</span><span>${nf(s*100,1)}%</span></div>`}).join(""):`<p class="note">Появится, когда в портфеле будут бумаги с ценой.</p>`;
+}
+
+function render(){const G=groups();renderHead(G);renderQuotes();renderTable(G);renderBars(G)}
+
+function setStatus(t){$("status").textContent=t}
+function persist(){
+  try{localStorage.setItem("portfolio-v2",JSON.stringify(S))}catch(e){}
+  if(!docRef)return;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    const data={lots:S.lots.map(l=>({...l}))};
+    saving=saving.then(()=>docRef.set(data)).then(()=>setStatus("Сохранено в вашем аккаунте")).catch(e=>setStatus("Не удалось сохранить в аккаунт ("+(e&&e.code||"ошибка")+"). Копия есть в этом браузере."));
+  },500);
+}
+
+/* ---- Combobox ---- */
+const fT=$("fT"),tkL=$("tkList");let hits=[],hi=-1;
+function showList(){
+  const q=fT.value.trim().toLowerCase();
+  hits=KASE.filter(([t,n])=>!q||t.toLowerCase().includes(q)||n.toLowerCase().includes(q))
+    .sort((a,b)=>(b[0].toLowerCase().startsWith(q))-(a[0].toLowerCase().startsWith(q)))
+    .slice(0,60);
+  hi=hits.length&&q?0:-1;
+  tkL.innerHTML=hits.length?hits.map(([t,n,c],i)=>`<li role="option" id="tk${i}" data-i="${i}" aria-selected="${i===hi}"><b>${esc(t)}</b><span>${esc(n)}</span><span>${esc(c)}</span></li>`).join(""):`<li class="none">Нет такой бумаги в списке KASE</li>`;
+  tkL.hidden=false;fT.setAttribute("aria-expanded","true");
+  if(hi>=0)fT.setAttribute("aria-activedescendant","tk"+hi);else fT.removeAttribute("aria-activedescendant");
+}
+function hideList(){tkL.hidden=true;fT.setAttribute("aria-expanded","false");fT.removeAttribute("aria-activedescendant")}
+function pickHit(i){const h=hits[i];if(!h)return;fT.value=h[0];$("fC").value=h[2];$("fErr").textContent="";hideList();$("fQ").focus()}
+function moveHi(d){
+  if(!hits.length)return;hi=(hi+d+hits.length)%hits.length;
+  [...tkL.children].forEach((li,i)=>li.setAttribute("aria-selected",i===hi));
+  fT.setAttribute("aria-activedescendant","tk"+hi);
+  tkL.children[hi]?.scrollIntoView({block:"nearest"});
+}
+const matchTicker=()=>{const t=fT.value.trim().toUpperCase();return Object.keys(CUR).find(x=>x.toUpperCase()===t)||null};
+const syncCur=()=>{const k=matchTicker();$("fC").value=k?CUR[k]:"";return k};
+fT.addEventListener("input",()=>{syncCur();$("fErr").textContent="";showList()});
+fT.addEventListener("focus",showList);
+fT.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();tkL.hidden?showList():moveHi(1)}
+  else if(e.key==="ArrowUp"){e.preventDefault();moveHi(-1)}
+  else if(e.key==="Enter"&&!tkL.hidden&&hi>=0){e.preventDefault();pickHit(hi)}
+  else if(e.key==="Escape"){hideList()}
+});
+tkL.addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();pickHit(+li.dataset.i)}});
+fT.addEventListener("blur",()=>setTimeout(hideList,120));
+
+$("add").addEventListener("submit",e=>{
+  e.preventDefault();
+  const err=$("fErr");
+  const t=syncCur();
+  if(!t){err.textContent="Выберите бумагу из списка KASE";fT.focus();showList();return}
+  const q=Number($("fQ").value),pv=$("fP").value.trim(),d=$("fD").value;
+  if(!(q>0)){err.textContent="Укажите количество больше 0";$("fQ").focus();return}
+  if(!d){err.textContent="Укажите дату покупки";$("fD").focus();return}
+  if(d>today()){err.textContent="Дата покупки не может быть в будущем";$("fD").focus();return}
+  const p=pv===""?null:Number(pv);
+  if(p!=null&&!(p>0)){err.textContent="Цена должна быть больше 0 или оставьте поле пустым";$("fP").focus();return}
+  err.textContent="";
+  S.lots.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),t,q,d,p,c:CUR[t],src:p==null?null:"своя цена"});
+  fT.value=t;$("fQ").value="";$("fP").value="";$("fQ").focus();
+  render();persist();
+});
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");
+  if(!b){if(armed){armed=null;render()}return}
+  if(b.dataset.open){open[b.dataset.open]=!open[b.dataset.open];render();return}
+  if(b.dataset.del){
+    if(armed===b.dataset.del){S.lots=S.lots.filter(l=>l.id!==armed);armed=null;render();persist()}
+    else{armed=b.dataset.del;render()}
+    return;
+  }
+  if(armed){armed=null;render()}
+  if(b.dataset.pick){fT.value=b.dataset.pick;syncCur();$("fQ").focus()}
+});
+
+$("fD").value=today();$("fD").max=today();
+try{const s=JSON.parse(localStorage.getItem("portfolio-v2")||"null");if(s&&Array.isArray(s.lots))S={lots:s.lots}}catch(e){}
+render();
+
+/* ---- Snapshot of prices for hosting outside claude.ai (GitHub Pages) ---- */
+function applyMarket(d){
+  if(!d||typeof d!=="object")return;
+  if(d.fx&&num(d.fx.r)!=null)M.fx={...d.fx};
+  M.px={};for(const[k,v]of Object.entries(d.px||{}))if(v&&typeof v==="object")M.px[k]={...v};
+  render();
+}
+async function loadSnapshot(){
+  try{const r=await fetch("data/market-latest.json",{cache:"no-cache"});if(r.ok)applyMarket(await r.json())}catch(e){}
+}
+
+/* ---- Account storage (claude.ai db) ---- */
+(async()=>{
+  if(!window.claude?.use){
+    setStatus("Портфель хранится в этом браузере. Цены — снимок KASE и Нацбанка из репозитория.");
+    loadSnapshot();return;
+  }
+  const timer=setTimeout(()=>setStatus("Хранилище пока недоступно — данные сохраняются только в этом браузере"),10000);
+  try{
+    const db=await (window.claude.use("db")??null);
+    if(!db){clearTimeout(timer);setStatus("Хранилище недоступно — данные сохраняются только в этом браузере");loadSnapshot();return}
+    db.doc("market/latest").onSnapshot(sn=>{const d=sn.exists&&sn.data();if(d)applyMarket(d)},()=>{});
+    docRef=db.doc("portfolio/main");
+    let first=true;
+    docRef.onSnapshot(sn=>{
+      clearTimeout(timer);
+      if(sn.exists){
+        const d=sn.data();
+        if(d&&Array.isArray(d.lots)){S={lots:d.lots.map(l=>({...l}))};try{localStorage.setItem("portfolio-v2",JSON.stringify(S))}catch(e){}render()}
+      }else if(first&&S.lots.length)persist();
+      if(first&&!sn.metadata?.fromCache){first=false;setStatus("Портфель сохраняется в вашем аккаунте")}
+    },()=>{clearTimeout(timer);setStatus("Нет доступа к хранилищу — данные сохраняются только в этом браузере")});
+  }catch(e){clearTimeout(timer);setStatus("Хранилище недоступно — данные сохраняются только в этом браузере")}
+})();
+})();
+</script>
+
+</body>
+</html>
